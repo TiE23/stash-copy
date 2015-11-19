@@ -1,7 +1,7 @@
 [
-   {
-        "id": "copystash",
-        "caption": "Copy URL to Stash Page",
-        "command": "copy_stash"
-    }
+  {
+    "id": "copystash",
+    "caption": "Copy URL to Stash Page",
+    "command": "copy_stash"
+  }
 ]
