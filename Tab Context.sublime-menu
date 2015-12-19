@@ -9,5 +9,9 @@
   {
     "command": "copy_stash_with_git",
     "caption": "Copy URL to Stash Page w/ Git Commit"
+  },
+  {
+    "command": "copy_relative_path",
+    "caption": "Copy Path to File"
   }
 ]
