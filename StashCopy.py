@@ -1,6 +1,7 @@
 import os
 import re
 from subprocess import Popen, PIPE
+from platform import system
 
 import sublime
 import sublime_plugin
@@ -43,6 +44,11 @@ def getProject(repoName):
 
   return targetProject
 
+
+if system() == "Windows":
+  slash = "\\"
+else:
+  slash = "/"
 
 # Get the Git Commit Hash ID
 def gitHash(repoPath):
@@ -91,7 +97,7 @@ def getPaths(obj):
   for folder in projectFolders:
     if folder in path:
       relativeToFolder = path.replace(folder, '')[1:]
-      repoName = relativeToFolder[:relativeToFolder.find('/')]
+      repoName = relativeToFolder[:relativeToFolder.find(slash)]
       relativeToRepo = relativeToFolder[len(repoName)+1:]
       pathToRepo = path[:-len(relativeToRepo)-1]
       break
@@ -134,7 +140,6 @@ class CopyStashCommand(sublime_plugin.TextCommand):
 
     # Git business
     if gitEnabled:
-      sublime.status_message("Please wait... Doing Git stuff...")
       hashID = gitHash(paths[3])
       pushed = gitPushed(paths[3])
       suspect = not pushed or self.view.is_dirty() or gitDirty(paths[3], paths[4])
@@ -166,7 +171,7 @@ class CopyStashCommand(sublime_plugin.TextCommand):
     url = 'https://stash.atg-corp.com/projects/%s/repos/%s/browse/%s%s%s' % \
     (targetProject, paths[1], paths[2], hashArgument, lineArgument)
     sublime.set_clipboard(url)
-    sublime.status_message("Copied Stash URL%s%s" % (lineMessage, hashMessage))
+    sublime.status_message("Stash URL Copied%s%s" % (lineMessage, hashMessage))
     print("URL: %s" % url)
 
 

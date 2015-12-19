@@ -30,7 +30,7 @@ Be sure that all your open repositories reside in a single directory such as ~/g
 ~/git/backend/repo.03
 ```
 
-In Sublime then open the entire ~/git directory
+In Sublime open the entire ~/git directory.
 
 #### Notes
 - It will warn you if you attempt to copy a git commit with a commit that isn't tracked remotely (not pushed).
@@ -69,4 +69,4 @@ Right clicking on an open file will reveal the same commands: "Copy URL to Stash
 Right clicking on a file tab will reveal the same commands: "Copy URL to Stash Page" and "Copy URL to Stash Page w/ Git Commit" with keyboard shortcut reminders.
 
 # Copyright
-This software is licensed under the Hogwarts School of Witchcraft and Wizardry License. ¯\\_(ツ)_/¯
+This software is licensed under the Hogwarts School of Witchcraft and Wizardry License. ¯\\\_(ツ)\_/¯
