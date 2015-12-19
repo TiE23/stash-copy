@@ -1,3 +1,4 @@
 [
-  { "keys": ["super+shift+x"], "command": "copy_stash" }
+  { "keys": ["super+shift+x"], "command": "copy_stash" },
+  { "keys": ["super+alt+x"], "command": "copy_stash_with_git" }
 ]

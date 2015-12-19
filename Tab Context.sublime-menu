@@ -1,4 +1,13 @@
 [
-  { "caption": "-" },
-  { "command": "copy_stash", "caption": "Copy URL to Stash Page" }
+  {
+    "caption": "-"
+  },
+  {
+    "command": "copy_stash",
+    "caption": "Copy URL to Stash Page"
+  },
+  {
+    "command": "copy_stash_with_git",
+    "caption": "Copy URL to Stash Page w/ Git Commit"
+  }
 ]

@@ -44,22 +44,32 @@ def getProject(repoName):
   return targetProject
 
 
+# Get the Git Commit Hash ID
 def gitHash(repoPath):
   command = ['git', 'rev-parse', 'HEAD']
 
-  return gitExecute(command, repoPath)
+  return simpleShellExecute(command, repoPath)
 
 
+# Check if the current commit has been pushed / is tracked
 def gitPushed(repoPath):
   command = ['git', 'branch', '-r', '--contains']
 
-  return len(gitExecute(command, repoPath)) != 0
+  return len(simpleShellExecute(command, repoPath)) != 0
 
 
-def gitExecute(command, repoPath):
-  execution = Popen(command, cwd=repoPath, stdout=PIPE, stderr=PIPE)
+# Check if the current file is recognized by git as different. Do this by grepping the diff file list
+def gitDirty(repoPath, fileName):
+  p1 = Popen(['git', 'diff', '--name-only'], cwd=repoPath, stdout=PIPE, stderr=PIPE)
+  p2 = Popen(['grep', fileName], cwd=repoPath, stdin=p1.stdout, stdout=PIPE, stderr=PIPE)
+
+  return len(p2.communicate()[0].decode('utf-8')) != 0
+
+
+def simpleShellExecute(command, executePath):
+  execution = Popen(command, cwd=executePath, stdout=PIPE, stderr=PIPE)
   (results, error) = execution.communicate()
-  print(repoPath)
+
   if len(error) == 0:
     return results.decode('utf-8')
   else:
@@ -104,7 +114,7 @@ def getLine(obj):
 # Stash link command
 class CopyStashCommand(sublime_plugin.TextCommand):
 
-  def run(self, edit):
+  def run(self, edit, gitEnabled=False):
     paths = getPaths(self)
 
     if paths[1] == '':
@@ -117,26 +127,41 @@ class CopyStashCommand(sublime_plugin.TextCommand):
       sublime.status_message("Stash URL Copy Failed: Repo name \"%s\" not recognized." % paths[1])
       return
 
-    line = getLine(self)
-    hashID = gitHash(paths[3])
-
-    pushed = gitPushed(paths[3])
-
-    # Hash argument
-    if hashID != "":
-      if pushed:
-        hashArgument = "?at=%s" % hashID
-        hashMessage = " (linked to commit %s)" % hashID[:8]
-      else:
-        hashArgument = ""
-        hashMessage = " (not linked to commit %s - it's not pushed!)" % hashID[:8]
-    else:
-      hashArgument = ""
-      hashMessage = " (Problem with Git!?)"
-
     # Line argument
+    line = getLine(self)
     lineArgument = "" if line <= 1 else "#%s" % str(line)
     lineMessage = "" if lineArgument == "" else " to line %s" % lineArgument
+
+    # Git business
+    if gitEnabled:
+      sublime.status_message("Please wait... Doing Git stuff...")
+      hashID = gitHash(paths[3])
+      pushed = gitPushed(paths[3])
+      suspect = not pushed or self.view.is_dirty() or gitDirty(paths[3], paths[4])
+
+      # Hash argument
+      if hashID != "":
+        if pushed:
+          # The current commit is pushed, so we can link to it.
+          hashArgument = "?at=%s" % hashID
+          hashMessage = " (linked to commit %s)" % hashID[:8]
+        else:
+          # Commit isn't pushed, don't bother linking - people cannot view it.
+          hashArgument = ""
+          hashMessage = " (not linked to commit %s - it's not pushed!)" % hashID[:8]
+      else:
+        # Git returned nothing in stdout - problem?
+        hashArgument = ""
+        hashMessage = " (Problem with Git!?)"
+    else:
+      # Not doing Git stuff
+      hashArgument = ""
+      hashMessage = ""
+      suspect = self.view.is_dirty()
+
+    # Warn the user if the file is dirty (buffer or git is dirty) or commit is not pushed
+    if suspect and lineArgument != "":
+      lineMessage += " <--might be wrong!"
 
     url = 'https://stash.atg-corp.com/projects/%s/repos/%s/browse/%s%s%s' % \
     (targetProject, paths[1], paths[2], hashArgument, lineArgument)
@@ -147,6 +172,15 @@ class CopyStashCommand(sublime_plugin.TextCommand):
 
   def is_enabled(self):
     return bool(self.view.file_name() and len(self.view.file_name()) > 0)
+
+
+# Variation of CopyStashCommand with Git-goodness
+class CopyStashWithGit(sublime_plugin.TextCommand):
+  def run(self, edit):
+    CopyStashCommand.run(self, edit, True)
+
+  def is_enabled(self):
+    return CopyStashCommand.is_enabled(self)
 
 
 # Relative path command
