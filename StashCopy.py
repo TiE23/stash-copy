@@ -1,5 +1,6 @@
 import os
 import re
+from subprocess import Popen, PIPE
 
 import sublime
 import sublime_plugin
@@ -33,7 +34,7 @@ def getProject(repoName):
     'UC':     ['atg-lodef','fci.selenium','fci.selenium.agents','hybrid.client','naiad.client.js','naiad.flash','naiad.thinflash'],
     'VM':     ['atg.pds','base-devel','caster-tv','cb-maila-salt','crm','debian-7.4','debian-crm','mg-maila-salt','n-maila-salt','skunkworks','vm.n-liveservices-salt-prod']
   }
-  targetProject = 'UNKNOWN'
+  targetProject = False
   for project in projects:
     repolist = projects[project]
     if repoName in repolist:
@@ -43,61 +44,156 @@ def getProject(repoName):
   return targetProject
 
 
-# Return the path of the file.
-def getPath(obj):
+# Get the Git Commit Hash ID
+def gitHash(repoPath):
+  command = ['git', 'rev-parse', 'HEAD']
+
+  return simpleShellExecute(command, repoPath)
+
+
+# Check if the current commit has been pushed / is tracked
+def gitPushed(repoPath):
+  command = ['git', 'branch', '-r', '--contains']
+
+  return len(simpleShellExecute(command, repoPath)) != 0
+
+
+# Check if the current file is recognized by git as different. Do this by grepping the diff file list
+def gitDirty(repoPath, fileName):
+  p1 = Popen(['git', 'diff', '--name-only'], cwd=repoPath, stdout=PIPE, stderr=PIPE)
+  p2 = Popen(['grep', fileName], cwd=repoPath, stdin=p1.stdout, stdout=PIPE, stderr=PIPE)
+
+  return len(p2.communicate()[0].decode('utf-8')) != 0
+
+
+def simpleShellExecute(command, executePath):
+  execution = Popen(command, cwd=executePath, stdout=PIPE, stderr=PIPE)
+  (results, error) = execution.communicate()
+
+  if len(error) == 0:
+    return results.decode('utf-8')
+  else:
+    return ""
+
+
+# Return various paths to the file.
+def getPaths(obj):
   projectFolders = obj.view.window().folders()
   path = obj.view.file_name()
+
+  relativeToFolder = path # If outside of open folder, we'll just give absolute path
+  repoName = ''
+  relativeToRepo = ''
+  pathToRepo = ''
+  fileName = os.path.basename(path)
+
+  # In the case that we have multiple folders open, find the one the file is in.
   for folder in projectFolders:
-    if folder in obj.view.file_name():
-      path = path.replace(folder, '')[1:]
+    if folder in path:
+      relativeToFolder = path.replace(folder, '')[1:]
+      repoName = relativeToFolder[:relativeToFolder.find('/')]
+      relativeToRepo = relativeToFolder[len(repoName)+1:]
+      pathToRepo = path[:-len(relativeToRepo)-1]
       break
 
-  return path
+  # Return a number of different file paths for various uses
+  # ex: ['my.repo/dir/file.php', 'my.repo', 'dir/file.php', '/Users/me/git/my.repo', 'file.php']
+  # If outside of folder structure, returns full path in first subarray
+  return [relativeToFolder, repoName, relativeToRepo, pathToRepo, fileName]
 
 
 # If more than one character is selected it will return a Stash line argument
-def getLineOption(obj):
+def getLine(obj):
   if not obj.view.sel()[0].empty():
     (row,col) = obj.view.rowcol(obj.view.sel()[0].begin())
-    return "#" + str(row+1)
+    return row+1
   else:
-    return ""
+    return -1
 
 
 # Stash link command
 class CopyStashCommand(sublime_plugin.TextCommand):
 
-  def run(self, edit):
-    self.path = getPath(self)
+  def run(self, edit, gitEnabled=False):
+    paths = getPaths(self)
 
-    # Returns the first directory and the following path.
-    # Example: 'my.repo/directory/file.php' returns ['my.repo', '/directory/file.php']
-    matches = re.match(r"^([^\/]*)(.*)", self.path).groups()
-
-    if len(matches) != 2:
-      sublime.status_message("Stash URL Copy Failed: %s" % self.path)
+    if paths[1] == '':
+      sublime.status_message("Stash URL Copy Failed: No repo name detected.")
       return
 
-    targetProject = getProject(matches[0])
-    lineArugment = getLineOption(self)
+    targetProject = getProject(paths[1])
 
-    url = 'https://stash.atg-corp.com/projects/%s/repos/%s/browse%s%s' % \
-    (targetProject, matches[0], matches[1], lineArugment)
+    if targetProject == False:
+      sublime.status_message("Stash URL Copy Failed: Repo name \"%s\" not recognized." % paths[1])
+      return
+
+    # Line argument
+    line = getLine(self)
+    lineArgument = "" if line <= 1 else "#%s" % str(line)
+    lineMessage = "" if lineArgument == "" else " to line %s" % lineArgument
+
+    # Git business
+    if gitEnabled:
+      sublime.status_message("Please wait... Doing Git stuff...")
+      hashID = gitHash(paths[3])
+      pushed = gitPushed(paths[3])
+      suspect = not pushed or self.view.is_dirty() or gitDirty(paths[3], paths[4])
+
+      # Hash argument
+      if hashID != "":
+        if pushed:
+          # The current commit is pushed, so we can link to it.
+          hashArgument = "?at=%s" % hashID
+          hashMessage = " (linked to commit %s)" % hashID[:8]
+        else:
+          # Commit isn't pushed, don't bother linking - people cannot view it.
+          hashArgument = ""
+          hashMessage = " (not linked to commit %s - it's not pushed!)" % hashID[:8]
+      else:
+        # Git returned nothing in stdout - problem?
+        hashArgument = ""
+        hashMessage = " (Problem with Git!?)"
+    else:
+      # Not doing Git stuff
+      hashArgument = ""
+      hashMessage = ""
+      suspect = self.view.is_dirty()
+
+    # Warn the user if the file is dirty (buffer or git is dirty) or commit is not pushed
+    if suspect and lineArgument != "":
+      lineMessage += " <--might be wrong!"
+
+    url = 'https://stash.atg-corp.com/projects/%s/repos/%s/browse/%s%s%s' % \
+    (targetProject, paths[1], paths[2], hashArgument, lineArgument)
     sublime.set_clipboard(url)
-    sublime.status_message("Copied Stash URL: %s" % url)
+    sublime.status_message("Copied Stash URL%s%s" % (lineMessage, hashMessage))
+    print("URL: %s" % url)
 
 
   def is_enabled(self):
     return bool(self.view.file_name() and len(self.view.file_name()) > 0)
 
 
+# Variation of CopyStashCommand with Git-goodness
+class CopyStashWithGit(sublime_plugin.TextCommand):
+  def run(self, edit):
+    CopyStashCommand.run(self, edit, True)
+
+  def is_enabled(self):
+    return CopyStashCommand.is_enabled(self)
+
+
 # Relative path command
 class CopyRelativePathCommand(sublime_plugin.TextCommand):
 
   def run(self, edit):
-    self.path = getPath(self)
-    sublime.set_clipboard(self.path)
-    sublime.status_message("Copied file directory: %s" % self.path)
+    paths = getPaths(self)
+    if paths[1] == '':
+      message = "Copied absolute file path: %s"
+    else:
+      message = "Copied relative file path: %s"
+    sublime.set_clipboard(paths[0])
+    sublime.status_message(message % paths[0])
 
 
   def is_enabled(self):
