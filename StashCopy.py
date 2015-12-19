@@ -34,7 +34,7 @@ def getProject(repoName):
     'UC':     ['atg-lodef','fci.selenium','fci.selenium.agents','hybrid.client','naiad.client.js','naiad.flash','naiad.thinflash'],
     'VM':     ['atg.pds','base-devel','caster-tv','cb-maila-salt','crm','debian-7.4','debian-crm','mg-maila-salt','n-maila-salt','skunkworks','vm.n-liveservices-salt-prod']
   }
-  targetProject = 'UNKNOWN'
+  targetProject = False
   for project in projects:
     repolist = projects[project]
     if repoName in repolist:
@@ -53,7 +53,7 @@ def gitHash(repoPath):
 def gitPushed(repoPath):
   command = ['git', 'branch', '-r', '--contains']
 
-  return gitExecute(command, repoPath)
+  return len(gitExecute(command, repoPath)) != 0
 
 
 def gitExecute(command, repoPath):
@@ -106,28 +106,43 @@ class CopyStashCommand(sublime_plugin.TextCommand):
 
   def run(self, edit):
     paths = getPaths(self)
-    print(paths)
+
     if paths[1] == '':
-      sublime.status_message("Stash URL Copy Failed")
+      sublime.status_message("Stash URL Copy Failed: No repo name detected.")
       return
 
     targetProject = getProject(paths[1])
+
+    if targetProject == False:
+      sublime.status_message("Stash URL Copy Failed: Repo name \"%s\" not recognized." % paths[1])
+      return
+
     line = getLine(self)
-    longHashID = gitHash(paths[3])
-    shortHashID = longHashID[:8]
-    print(longHashID)
+    hashID = gitHash(paths[3])
 
-    pushed = len(gitPushed(paths[3])) != 0
-    print(pushed)
+    pushed = gitPushed(paths[3])
 
-    hashArgument = "" #if longHashID == "" and not pushed else "?at=%s" % longHashID
-    lineArgument = "" #if line == -1 else "#%s" % str(line)
+    # Hash argument
+    if hashID != "":
+      if pushed:
+        hashArgument = "?at=%s" % hashID
+        hashMessage = " (linked to commit %s)" % hashID[:8]
+      else:
+        hashArgument = ""
+        hashMessage = " (not linked to commit %s - it's not pushed!)" % hashID[:8]
+    else:
+      hashArgument = ""
+      hashMessage = " (Problem with Git!?)"
+
+    # Line argument
+    lineArgument = "" if line <= 1 else "#%s" % str(line)
+    lineMessage = "" if lineArgument == "" else " to line %s" % lineArgument
 
     url = 'https://stash.atg-corp.com/projects/%s/repos/%s/browse/%s%s%s' % \
     (targetProject, paths[1], paths[2], hashArgument, lineArgument)
     sublime.set_clipboard(url)
-    sublime.status_message("Copied Stash URL")
-    print(url)
+    sublime.status_message("Copied Stash URL%s%s" % (lineMessage, hashMessage))
+    print("URL: %s" % url)
 
 
   def is_enabled(self):
