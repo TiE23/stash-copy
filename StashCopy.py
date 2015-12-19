@@ -1,5 +1,6 @@
 import os
 import re
+from subprocess import Popen, PIPE
 
 import sublime
 import sublime_plugin
@@ -43,48 +44,90 @@ def getProject(repoName):
   return targetProject
 
 
-# Return the path of the file.
-def getPath(obj):
+def gitHash(repoPath):
+  command = ['git', 'rev-parse', 'HEAD']
+
+  return gitExecute(command, repoPath)
+
+
+def gitPushed(repoPath):
+  command = ['git', 'branch', '-r', '--contains']
+
+  return gitExecute(command, repoPath)
+
+
+def gitExecute(command, repoPath):
+  execution = Popen(command, cwd=repoPath, stdout=PIPE, stderr=PIPE)
+  (results, error) = execution.communicate()
+  print(repoPath)
+  if len(error) == 0:
+    return results.decode('utf-8')
+  else:
+    return ""
+
+
+# Return various paths to the file.
+def getPaths(obj):
   projectFolders = obj.view.window().folders()
   path = obj.view.file_name()
+
+  relativeToFolder = path # If outside of open folder, we'll just give absolute path
+  repoName = ''
+  relativeToRepo = ''
+  pathToRepo = ''
+  fileName = os.path.basename(path)
+
+  # In the case that we have multiple folders open, find the one the file is in.
   for folder in projectFolders:
-    if folder in obj.view.file_name():
-      path = path.replace(folder, '')[1:]
+    if folder in path:
+      relativeToFolder = path.replace(folder, '')[1:]
+      repoName = relativeToFolder[:relativeToFolder.find('/')]
+      relativeToRepo = relativeToFolder[len(repoName)+1:]
+      pathToRepo = path[:-len(relativeToRepo)-1]
       break
 
-  return path
+  # Return a number of different file paths for various uses
+  # ex: ['my.repo/dir/file.php', 'my.repo', 'dir/file.php', '/Users/me/git/my.repo', 'file.php']
+  # If outside of folder structure, returns full path in first subarray
+  return [relativeToFolder, repoName, relativeToRepo, pathToRepo, fileName]
 
 
 # If more than one character is selected it will return a Stash line argument
-def getLineOption(obj):
+def getLine(obj):
   if not obj.view.sel()[0].empty():
     (row,col) = obj.view.rowcol(obj.view.sel()[0].begin())
-    return "#" + str(row+1)
+    return row+1
   else:
-    return ""
+    return -1
 
 
 # Stash link command
 class CopyStashCommand(sublime_plugin.TextCommand):
 
   def run(self, edit):
-    self.path = getPath(self)
-
-    # Returns the first directory and the following path.
-    # Example: 'my.repo/directory/file.php' returns ['my.repo', '/directory/file.php']
-    matches = re.match(r"^([^\/]*)(.*)", self.path).groups()
-
-    if len(matches) != 2:
-      sublime.status_message("Stash URL Copy Failed: %s" % self.path)
+    paths = getPaths(self)
+    print(paths)
+    if paths[1] == '':
+      sublime.status_message("Stash URL Copy Failed")
       return
 
-    targetProject = getProject(matches[0])
-    lineArugment = getLineOption(self)
+    targetProject = getProject(paths[1])
+    line = getLine(self)
+    longHashID = gitHash(paths[3])
+    shortHashID = longHashID[:8]
+    print(longHashID)
 
-    url = 'https://stash.atg-corp.com/projects/%s/repos/%s/browse%s%s' % \
-    (targetProject, matches[0], matches[1], lineArugment)
+    pushed = len(gitPushed(paths[3])) != 0
+    print(pushed)
+
+    hashArgument = "" #if longHashID == "" and not pushed else "?at=%s" % longHashID
+    lineArgument = "" #if line == -1 else "#%s" % str(line)
+
+    url = 'https://stash.atg-corp.com/projects/%s/repos/%s/browse/%s%s%s' % \
+    (targetProject, paths[1], paths[2], hashArgument, lineArgument)
     sublime.set_clipboard(url)
-    sublime.status_message("Copied Stash URL: %s" % url)
+    sublime.status_message("Copied Stash URL")
+    print(url)
 
 
   def is_enabled(self):
@@ -95,9 +138,13 @@ class CopyStashCommand(sublime_plugin.TextCommand):
 class CopyRelativePathCommand(sublime_plugin.TextCommand):
 
   def run(self, edit):
-    self.path = getPath(self)
-    sublime.set_clipboard(self.path)
-    sublime.status_message("Copied file directory: %s" % self.path)
+    paths = getPaths(self)
+    if paths[1] == '':
+      message = "Copied absolute file path: %s"
+    else:
+      message = "Copied relative file path: %s"
+    sublime.set_clipboard(paths[0])
+    sublime.status_message(message % paths[0])
 
 
   def is_enabled(self):
