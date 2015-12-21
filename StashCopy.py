@@ -77,7 +77,7 @@ def simpleShellExecute(command, executePath):
   (results, error) = execution.communicate()
 
   if len(error) == 0:
-    return results.decode('utf-8')
+    return results.decode('utf-8').strip()
   else:
     return ""
 
