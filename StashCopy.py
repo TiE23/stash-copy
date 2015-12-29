@@ -83,6 +83,11 @@ def simpleShellExecute(command, executePath):
 
 
 # Return various paths to the file.
+# Return a number of different file paths for various uses.
+# Ex: If a file's full path is /Users/me/git/my.repo/dir/file.php, you will get the following:
+#    ['my.repo/dir/file.php', 'my.repo', 'dir/file.php', '/Users/me/git/my.repo', 'file.php']
+# --- File with Repo -------- Repo Name - File no Repo ------ Repo location ------ File Name
+# If outside of folder structure, returns full path in first subarray.
 def getPaths(obj):
   projectFolders = obj.view.window().folders()
   path = obj.view.file_name()
@@ -102,9 +107,6 @@ def getPaths(obj):
       pathToRepo = path[:-len(relativeToRepo)-1]
       break
 
-  # Return a number of different file paths for various uses
-  # ex: ['my.repo/dir/file.php', 'my.repo', 'dir/file.php', '/Users/me/git/my.repo', 'file.php']
-  # If outside of folder structure, returns full path in first subarray
   return [relativeToFolder, repoName, relativeToRepo, pathToRepo, fileName]
 
 
