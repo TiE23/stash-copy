@@ -22,6 +22,7 @@ Share the file you're looking at on **any line**, on **any commit** in just one 
 ## Functionality
 ### Keyboard Shortcuts (OSX Examples)
 *For Windows and Linux simply swap out CMD with CTRL.*
+
 #### Basic file paths
 *Grab the relative path of any open file.*
 - CMD+SHIFT+C (*Folder Open in Sublime*)
@@ -30,6 +31,7 @@ Share the file you're looking at on **any line**, on **any commit** in just one 
 - CMD+SHIFT+C (*File Open Outside of Folder*)
   - Copy absolute file path.
   - Example: ```/Users/me/myfile.txt```
+
 #### Stash Links
 *Grab the URL to your file in Stash.*
 - CMD+SHIFT+X, CMD+SHIFT+X
@@ -40,6 +42,7 @@ Share the file you're looking at on **any line**, on **any commit** in just one 
   - Copy a link to Stash **with current Git commit ID**
     - **Highlight a line** and the URL will include a hotlink *to that line*.
   - Example: ```https://stash.example.com/projects/AA/repos/my.repo/browse/README?at=596f7527766520676f7420667265652074696d65```
+
 #### Jira Links
 *Variation of Stash Links that generates Jira-friendly hyperlinks.*
 - CMD+SHIFT+X, CMD+SHIFT+C
