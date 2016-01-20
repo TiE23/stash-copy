@@ -1,5 +1,7 @@
 [
-  { "keys": ["ctrl+shift+x"], "command": "copy_stash" },
-  { "keys": ["ctrl+alt+x"], "command": "copy_stash_with_git" },
+  { "keys": ["ctrl+shift+x", "ctrl+shift+x"], "command": "copy_stash" },
+  { "keys": ["ctrl+shift+x", "ctrl+shift+c"], "command": "copy_stash_with_jira_link" },
+  { "keys": ["ctrl+alt+x", "ctrl+alt+x"], "command": "copy_stash_with_git" },
+  { "keys": ["ctrl+alt+x", "ctrl+alt+c"], "command": "copy_stash_with_jira_link_with_git" },
   { "keys": ["ctrl+shift+c"], "command": "copy_relative_path" }
 ]

@@ -5,8 +5,18 @@
     "command": "copy_stash"
   },
   {
+    "id": "copystashwithjiralink",
+    "caption": "Copy Jira Link to Stash Page",
+    "command": "copy_stash_with_jira_link"
+  },
+  {
     "id": "copystashwithgit",
     "caption": "Copy URL to Stash Page w/ Git Commit",
     "command": "copy_stash_with_git"
+  },
+  {
+    "id": "copystashwithgit",
+    "caption": "Copy Jira Link to Stash Page w/ Git Commit",
+    "command": "copy_stash_with_jira_link_with_git"
   }
 ]

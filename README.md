@@ -9,6 +9,7 @@ Share the file you're looking at on **any line**, on **any commit** in just one 
 ### Features
 - Automatically include the Git commit ID in your URL.
 - Include a line number shortcut in your URL.
+- Automatically generate Jira hyperlinks with ```[Link Text|URL]``` syntax.
 - Copy relative-path to any file.
 
 ### When to use it
@@ -20,24 +21,35 @@ Share the file you're looking at on **any line**, on **any commit** in just one 
 
 ## Functionality
 ### Keyboard Shortcuts (OSX Examples)
-- CMD+SHIFT+C (Folder Open in Sublime)
+*For Windows and Linux simply swap out CMD with CTRL.*
+#### Basic file paths
+*Grab the relative path of any open file.*
+- CMD+SHIFT+C (*Folder Open in Sublime*)
   - Copy file path relative to your main git folder.
-  - Example: "my.repo/README"
-- CMD+SHIFT+C (File Open Outside of Folder)
+  - Example: ```my.repo/README```
+- CMD+SHIFT+C (*File Open Outside of Folder*)
   - Copy absolute file path.
-  - Example: "/Users/me/myfile.txt"
-- CMD+SHIFT+X
+  - Example: ```/Users/me/myfile.txt```
+#### Stash Links
+*Grab the URL to your file in Stash.*
+- CMD+SHIFT+X, CMD+SHIFT+X
   - Copy a link to Stash
-  - Example: "https://stash.example.com/projects/AA/repos/my.repo/browse/README"
-- CMD+SHIFT+X (Line is high-lighted)
-  - Copy a link to Stash at the selected line number
-  - Example: "https://stash.example.com/projects/AA/repos/my.repo/browse/README#42"
-- CMD+ALT+X
-  - Copy a link to Stash with current Git commit ID
-  - Example: "https://stash.example.com/projects/AA/repos/my.repo/browse/README?at=596f7527766520676f7420667265652074696d65"
-- CMD+ALT+X (Line is high-lighted)
-  - Copy a link to Stash with current Git commit ID at the selected line number
-  - Example: "https://stash.example.com/projects/AA/repos/my.repo/browse/README?at=596f7527766520676f7420667265652074696d65#42"
+    - **Highlight a line** and the URL will include a hotlink *to that line*.
+  - Example: ```https://stash.example.com/projects/AA/repos/my.repo/browse/README```
+- CMD+ALT+X, CMD+ALT+X
+  - Copy a link to Stash **with current Git commit ID**
+    - **Highlight a line** and the URL will include a hotlink *to that line*.
+  - Example: ```https://stash.example.com/projects/AA/repos/my.repo/browse/README?at=596f7527766520676f7420667265652074696d65```
+#### Jira Links
+*Variation of Stash Links that generates Jira-friendly hyperlinks.*
+- CMD+SHIFT+X, CMD+SHIFT+C
+  - Copy a link to Stash
+    - **Highlight a line** and the URL will include a hotlink *to that line*.
+  - Example: ```[my.repo/README|https://stash.example.com/projects/AA/repos/my.repo/browse/README]```
+- CMD+ALT+X, CMD+ALT+C
+  - Copy a link to Jira Link **with current Git commit ID**
+    - **Highlight a line** and the URL will include a hotlink *to that line*.
+  - Example: ```[my.repo/README (596f7527) |https://stash.example.com/projects/AA/repos/my.repo/browse/README?at=596f7527766520676f7420667265652074696d65]```
 
 ### Command Palette Shortcuts
 These shortcuts and also be found in the command pallet as "Copy URL to Stash Page" and "Copy URL to Stash Page w/ Git Commit".

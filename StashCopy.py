@@ -122,7 +122,7 @@ def getLine(obj):
 # Stash link command
 class CopyStashCommand(sublime_plugin.TextCommand):
 
-  def run(self, edit, gitEnabled=False):
+  def run(self, edit, gitEnabled=False, jiraLink=False):
     paths = getPaths(self)
 
     if paths[1] == '':
@@ -172,9 +172,23 @@ class CopyStashCommand(sublime_plugin.TextCommand):
 
     url = 'https://stash.atg-corp.com/projects/%s/repos/%s/browse/%s%s%s' % \
     (targetProject, paths[1], paths[2], hashArgument, lineArgument)
-    sublime.set_clipboard(url)
-    sublime.status_message("Stash URL Copied%s%s" % (lineMessage, hashMessage))
-    print("URL: %s" % url)
+
+    if jiraLink:
+      if gitEnabled:
+        linkText = "%s%s (%s)" % (paths[0], lineArgument, hashArgument[4:12])
+      else:
+        linkText = "%s%s" % (paths[0], lineArgument)
+
+      clipBoard = "[%s|%s]" % (linkText, url)
+      message = "Jira Link copied"
+    else:
+      clipBoard = url
+      message = "Stash URL copied"
+
+    sublime.set_clipboard(clipBoard)
+    sublime.status_message("%s%s%s" % (message, lineMessage, hashMessage))
+
+    print("Clipboard: %s" % clipBoard)
 
 
   def is_enabled(self):
@@ -184,11 +198,26 @@ class CopyStashCommand(sublime_plugin.TextCommand):
 # Variation of CopyStashCommand with Git-goodness
 class CopyStashWithGit(sublime_plugin.TextCommand):
   def run(self, edit):
-    CopyStashCommand.run(self, edit, True)
+    CopyStashCommand.run(self, edit, True, False)
 
   def is_enabled(self):
     return CopyStashCommand.is_enabled(self)
 
+# Variation of CopyStashCommand with Jira-goodness
+class CopyStashWithJiraLink(sublime_plugin.TextCommand):
+  def run(self, edit):
+    CopyStashCommand.run(self, edit, False, True)
+
+  def is_enabled(self):
+    return CopyStashCommand.is_enabled(self)
+
+# Variation of CopyStashCommand with Jira+Git-goodness
+class CopyStashWithJiraLinkWithGit(sublime_plugin.TextCommand):
+  def run(self, edit):
+    CopyStashCommand.run(self, edit, True, True)
+
+  def is_enabled(self):
+    return CopyStashCommand.is_enabled(self)
 
 # Relative path command
 class CopyRelativePathCommand(sublime_plugin.TextCommand):
@@ -199,9 +228,12 @@ class CopyRelativePathCommand(sublime_plugin.TextCommand):
       message = "Copied absolute file path: %s"
     else:
       message = "Copied relative file path: %s"
-    sublime.set_clipboard(paths[0])
+
+    clipBoard = paths[0]
+    sublime.set_clipboard(clipBoard)
     sublime.status_message(message % paths[0])
 
+    print("Clipboard: %s" % clipBoard)
 
   def is_enabled(self):
     return bool(self.view.file_name() and len(self.view.file_name()) > 0)
