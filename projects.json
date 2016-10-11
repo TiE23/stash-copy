@@ -62,6 +62,8 @@
     "nc.platform",
     "react.thinflash",
     "san.flash.as3",
+    "scp.mobile",
+    "scp.server",
     "sexadnet",
     "sexadnet.generated.configs",
     "sexadnet.qa",
@@ -83,7 +85,8 @@
     "icf.billing",
     "icfbilling.php",
     "naiad.bling",
-    "naiad.descriptorsites"
+    "naiad.descriptorsites",
+    "storm.docker"
   ],
   "BL": [
     "bl.client.js",
@@ -96,6 +99,13 @@
     "bic.server",
     "bic.utils"
   ],
+  "CM": [
+    "blackbook.pds",
+    "blackbook.svc",
+    "blackbook.webapp",
+    "gorilla",
+    "gorilla-frontend"
+  ],
   "CB": [
     "cambuilder.tools",
     "cb.vm",
@@ -105,24 +115,20 @@
     "naiad.cambuilder.webapp",
     "naiad.sitebuilder"
   ],
-  "CM": [
-    "blackbook.pds",
-    "blackbook.svc",
-    "blackbook.webapp",
-    "gorilla",
-    "gorilla-frontend"
-  ],
   "TV": [
     "naiad.producer",
     "tvbroadcast",
     "xojo"
   ],
   "CORE": [
-    "auth.service",
+    "auth.webservice",
+    "examplenodejs.webservice",
+    "examplephp.webservice",
+    "examplereact",
     "icf.authn",
     "icf.core",
     "icf.core.js",
-    "icf.example.app.php",
+    "icf.coredeprecated",
     "icf.loms",
     "icf.xment",
     "icf.xment.admin",
@@ -159,6 +165,7 @@
     "2016_Q2_hackathon-achievements",
     "hello_world",
     "icf.docker.apache.php",
+    "icf.docker.elk",
     "icf.docker.java",
     "icf.docker.kafka",
     "icf.docker.mysql",
@@ -166,6 +173,7 @@
     "icf.docker.node",
     "icf.docker.redis",
     "icf.docker.site-proxy",
+    "icf.docker.statsd",
     "icf.docker.tomcat",
     "icf.docker.zookeeper",
     "prower",
@@ -220,6 +228,8 @@
     "atg-service-wrapper",
     "atg-transcode-process",
     "atg-xmlstreamserver",
+    "icf.node.modules",
+    "icf.react.components",
     "libs"
   ],
   "PROTO": [
@@ -234,13 +244,14 @@
     "streamatedesktop.tide"
   ],
   "QA": [
-    "cambuilder.robot",
     "computer.magician",
+    "DEPRECATED.cambuilder.robot",
+    "DEPRECATED.qa.benchmark",
+    "DEPRECATED.qa.common",
+    "DEPRECATED.qa.scp.robot",
     "membership.robot",
     "qa.apitest",
-    "qa.benchmark",
-    "qa.common",
-    "qa.scp.robot",
+    "qa.atg.robot",
     "SMM.robot",
     "streamate.robot",
     "streaming.robot"
@@ -248,6 +259,7 @@
   "SS": [
     "availperf.redis",
     "handyperf",
+    "jupyter-notebook.tool",
     "search.api"
   ],
   "SM": [
@@ -257,18 +269,17 @@
     "naiad.skin",
     "naiad.streamate",
     "naiad.webapp.streamate",
-    "sdet.tools"
-  ],
-  "SCP": [
-    "scp",
-    "scp.mobile",
-    "scp.server"
+    "preference.webservice",
+    "sdet.tools",
+    "streamate.server"
   ],
   "SMM": [
     "flare",
+    "inmail.webservice",
     "modelmedia",
     "naiad.smm",
     "performer.api",
+    "performer.webservice",
     "performerdesktop.tide",
     "smmoauth",
     "TideSDK",
@@ -314,7 +325,6 @@
   ],
   "UC": [
     "atg-data",
-    "atg-lodef",
     "fci.selenium",
     "fci.selenium.agents",
     "hybrid.client",
