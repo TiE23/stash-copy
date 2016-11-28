@@ -8,6 +8,7 @@
     "atg_stats",
     "cachegenerator",
     "Console",
+    "itsup.webservice",
     "logsummarizer",
     "marketplaceapi",
     "marketplacelib",
@@ -84,9 +85,13 @@
     "fap.services",
     "icf.billing",
     "icfbilling.php",
+    "kafkacreator.stormtopology.java",
+    "kafkareader.storm",
     "naiad.bling",
     "naiad.descriptorsites",
-    "storm.docker"
+    "sdk.authn.python",
+    "storm.docker",
+    "storm.docker.old"
   ],
   "BL": [
     "bl.client.js",
@@ -108,7 +113,9 @@
   ],
   "CB": [
     "cambuilder.tools",
+    "cambuilder.webservice",
     "cb.vm",
+    "dev.aaron",
     "naiad.cambuilder",
     "naiad.cambuilder.build",
     "naiad.cambuilder.homepage",
@@ -121,6 +128,7 @@
     "xojo"
   ],
   "CORE": [
+    "analytics.webservice",
     "auth.webservice",
     "examplenodejs.webservice",
     "examplephp.webservice",
@@ -133,15 +141,18 @@
     "icf.xment",
     "icf.xment.admin",
     "localdev.docker",
+    "loms.webservice",
     "sdk.auth.php",
     "sdk.loms.php",
     "sdk.xment.php",
-    "volt.tool"
+    "volt.tool",
+    "xment.webservice"
   ],
   "CREA": [
     "creative.join"
   ],
   "DB": [
+    "dataservices.webservice",
     "db.bi",
     "db.live"
   ],
@@ -152,6 +163,7 @@
     "fci.make",
     "jenkins-config",
     "jenkins-config-sg",
+    "multipass",
     "naiad.internal",
     "networkshaper",
     "schnauzer",
@@ -164,6 +176,8 @@
   "DOPS": [
     "2016_Q2_hackathon-achievements",
     "hello_world",
+    "icf.compose.deploy",
+    "icf.devbase",
     "icf.docker.apache.php",
     "icf.docker.elk",
     "icf.docker.java",
@@ -171,11 +185,14 @@
     "icf.docker.mysql",
     "icf.docker.nginx",
     "icf.docker.node",
+    "icf.docker.nodejs",
     "icf.docker.redis",
     "icf.docker.site-proxy",
+    "icf.docker.smalldb",
     "icf.docker.statsd",
     "icf.docker.tomcat",
     "icf.docker.zookeeper",
+    "icf.localdev",
     "prower",
     "voltron"
   ],
@@ -228,9 +245,16 @@
     "atg-service-wrapper",
     "atg-transcode-process",
     "atg-xmlstreamserver",
-    "icf.node.modules",
+    "icf-analytics",
+    "icf-loms",
+    "icf-performance-timing",
+    "icf-tracking",
+    "icf-tracking-middleware",
     "icf.react.components",
     "libs"
+  ],
+  "PSUP": [
+    "bradmin"
   ],
   "PROTO": [
     "3dvision.silverlight",
@@ -252,9 +276,11 @@
     "membership.robot",
     "qa.apitest",
     "qa.atg.robot",
+    "qa.play.with.git",
     "SMM.robot",
     "streamate.robot",
-    "streaming.robot"
+    "streaming.robot",
+    "ta.webservice"
   ],
   "SS": [
     "availperf.redis",
@@ -298,6 +324,7 @@
     "enc.control.service.breakpad",
     "enc.control.service.mobile.mock",
     "enc.control.service.mock",
+    "enc.crashreport.service",
     "enc.desktop",
     "enc.ios",
     "ls.health",
@@ -313,6 +340,7 @@
     "ops.n-liveservices-salt",
     "ops.n-liveservices-salt-prod",
     "ops.packer",
+    "performer.streamingcenter",
     "rip.fms",
     "rip.fms.asc",
     "rip.fms.gateway",
@@ -321,7 +349,8 @@
     "rip.wowza.abr",
     "rip.wowza.auth",
     "rip.wowza.monitor",
-    "rip.wowza.transcodecontrol"
+    "rip.wowza.transcodecontrol",
+    "streaming.webservice"
   ],
   "UC": [
     "atg-data",
