@@ -166,21 +166,23 @@
     "auth.webservice",
     "etcatg.vault",
     "examplenodejs.webservice",
-    "examplephp.webservice",
     "examplereact",
     "heartbeat.webservice",
     "icf.authn",
-    "icf.core",
     "icf.core.java",
-    "icf.coredeprecated",
     "localdev.docker",
     "monitor.webservice",
-    "sdk.auth.php",
-    "sdk.loms.php",
-    "sdk.xment.php",
     "storm-docker",
     "useragent.webservice",
     "volt.tool"
+  ],
+  "COREPHP":[
+    "icf.core",
+    "examplephp.webservice",
+    "icf.coredeprecated",
+    "sdk.auth.php",
+    "sdk.loms.php",
+    "sdk.xment.php"
   ],
   "CREA": [
     "creative.join"
